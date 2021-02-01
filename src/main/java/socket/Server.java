@@ -26,7 +26,7 @@ public class Server {
             此时需要更换一个端口在尝试启动，或者将占用用该端口的程序关闭后再尝试启动当前程序。
              */
             System.out.println("正在启动服务端");
-            serverSocket=new ServerSocket(8088);
+            serverSocket=new ServerSocket(8089);
             System.out.println("启动完毕");
         } catch (IOException ioException) {
             ioException.printStackTrace();
@@ -41,25 +41,46 @@ public class Server {
             该方法是一个阻塞方法，调用程序就“卡住”了，此时开始等待客户端的连接，一旦一个客户端建立连接，
             此时accept方法会立即返回一个Socket实例，通过这个Socket就可以与连接的客户端进行交互了
              */
-            System.out.println("等待客户端连接。...");
-            Socket socket=serverSocket.accept();
-            System.out.println("一个客户端连接了");
+            while (true) {
+                System.out.println("等待客户端连接。...");
+                Socket socket = serverSocket.accept();
+                System.out.println("一个客户端连接了");
+                //启动一个线程处理与该客户端交互
+                Runnable handler=new ClientHandler(socket);
+                Thread t=new Thread(handler);
+                t.start();
+            }
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void main(String[] args) {
+        Server server=new Server();
+        server.start();
+    }
+    private class ClientHandler implements Runnable{
+        private Socket socket;
+        public ClientHandler(Socket socket){
+            this.socket=socket;
+        }
+
+        @Override
+        public void run() {
+            try {
             /*
             Socket提供的方法：
             InputStream getInputStream()
             通过socket获取的输入流可以读取远端计算机发送的数据
              */
-            InputStream in=socket.getInputStream();
-            BufferedReader br=new BufferedReader(new InputStreamReader(in,"UTF-8"));
-            String str=br.readLine();
-            System.out.println(str);
-        } catch (IOException e) {
-            e.printStackTrace();
+                InputStream in = socket.getInputStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+                String str;
+                while ((str = br.readLine()) != null) {
+                    System.out.println(str);
+                }
+            }catch (IOException ioException){
+                ioException.printStackTrace();
+            }
         }
-    }
-
-    public static void main(String[] args) {
-        Server server=new Server();
-        server.start();
     }
 }

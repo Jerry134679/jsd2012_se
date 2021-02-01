@@ -1,6 +1,8 @@
 package socket;
 import java.io.*;
 import java.net.Socket;
+import java.util.Scanner;
+
 /**
  * 聊天室客户端
  */
@@ -26,11 +28,19 @@ public class Client {
             System.out.println("正在连接服务端");
             //localhost表示本机的IP
             //实例化的过程就是连接的过程，若连接服务端失败会抛出异常
-            socket=new Socket("172.201.10.47",8088);
+            socket=new Socket("172.201.10.47",8089);
             System.out.println("与服务端链接！");
         } catch (IOException ioException) {
             ioException.printStackTrace();
-        }
+        }/*finally {
+            try {
+                //最终不再通讯时要关闭socket(相当于挂电话)
+                //socket关闭后，通过socket获取的输入流与输出流就自动关闭了
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }*/
     }
     /**
      * 客户端开始工作的方法
@@ -43,7 +53,15 @@ public class Client {
             该方法会返回一个字节输出流，通过这个输出流写出的字节会通过网络发送给远端计算机。
              */
             //通过输出流给服务端发送一句话
-            pw.println("Hello World");                   
+            Scanner scan=new Scanner(System.in);
+            System.out.println("请开始输入代码,输入exit返回");
+            while (true){
+                String str= scan.nextLine();
+                if("exit".equals(str)){
+                    break;
+                }
+                pw.println(str);
+            }
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
