@@ -2,7 +2,6 @@ package socket;
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
-
 /**
  * 聊天室客户端
  */
